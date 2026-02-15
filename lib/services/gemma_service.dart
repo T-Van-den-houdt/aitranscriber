@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:aitranscribe/core/constants.dart';
 import 'package:aitranscribe/services/ocr_service.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter/foundation.dart';
+import 'package:aitranscribe/constants.dart';
 
 class GemmaService {
   static final GemmaService _instance = GemmaService._internal();
@@ -21,8 +23,8 @@ class GemmaService {
     if (!FlutterGemma.hasActiveModel()) {
       await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
           .fromNetwork(
-            'https://huggingface.co/google/gemma-3n-E2B-it-litert-lm/resolve/main/gemma-3n-E2B-it-int4.litertlm',
-            token: "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",
+            AppConstants.modelUrlVision,
+            token: AppConstants.hfToken,
           )
           .withProgress((p) => downloadProgress.value = p / 100)
           .install();
