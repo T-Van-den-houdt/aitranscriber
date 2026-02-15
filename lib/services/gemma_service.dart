@@ -28,6 +28,7 @@ class GemmaService {
           )
           .withProgress((p) => downloadProgress.value = p / 100)
           .install();
+          debugPrint("Installed model: $AppConstants.modelUrlVision");
     }
 
     // 2. Pre-warm: Load model into memory
@@ -41,7 +42,6 @@ class GemmaService {
     
     isModelReady = true;
     downloadProgress.value = 1.0;
-    debugPrint("Gemma 3N: Pre-warmed and ready.");
   }
 
   Stream<String> toJsonStream(List<OcrLine> lines) async* {
