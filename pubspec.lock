@@ -157,10 +157,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: d07d37192dbf97461359c1518788f203b0c9102cfd2c35a716b823741219542c
+      sha256: "6d7fd89431262d8f3125e81b50d3847a091d846eafcd4fdb88dd06f36d705a45"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.5"
+    version: "2.2.0"
   file:
     dependency: transitive
     description:
@@ -226,10 +226,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_gemma
-      sha256: b60142ba4b6e0c2a922d33ed58f34230b10ecee7aba956c7d9b5cbc088170ea9
+      sha256: b9f29e79e54159949a95404fe16fd4987c03dabdedb2ba8a29eb19bf4c3ec6d8
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.3"
+    version: "0.12.4"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -604,10 +604,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: "1a97266a94f7350d30ae522c0af07890c70b8e62c71e8e3920d1db4d23c057d1"
+      sha256: "91bd59303e9f769f108f8df05e371341b15d59e995e6806aefab827b58336675"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.1"
+    version: "7.0.2"
   platform:
     dependency: transitive
     description:
@@ -660,10 +660,10 @@ packages:
     dependency: transitive
     description:
       name: sentry
-      sha256: "80b2a6667db8e0bb148ad70b2af242eb6aa8da9b56b56e72332a4221d93bc01d"
+      sha256: e57e57123968b673c8ca19892eecf93113b4811b8e5cd5d165749ca7f7319fdb
       url: "https://pub.dev"
     source: hosted
-    version: "9.12.0"
+    version: "9.13.0"
   sentry_dart_plugin:
     dependency: "direct dev"
     description:
@@ -676,10 +676,10 @@ packages:
     dependency: "direct main"
     description:
       name: sentry_flutter
-      sha256: df09c63e0111a9ad5c4a13a89def67327fc2028bec0f55c246d8c083d486e418
+      sha256: c8f5b805c0346cd0c93b09e584675af7ed8c3ef36c3589181ad19b4adce35954
       url: "https://pub.dev"
     source: hosted
-    version: "9.12.0"
+    version: "9.13.0"
   shared_preferences:
     dependency: transitive
     description:

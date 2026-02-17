@@ -54,7 +54,7 @@ class _OCRScreenState extends State<OCRScreen> {
         return;
       }
 
-      setState(() => _displayText = "Gemma is analuzing...");
+      setState(() => _displayText = "Gemma is analizing...");
 
       final stream = _gemma.toJsonStream(lines);
       

@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'package:aitranscribe/core/constants.dart';
 import 'package:aitranscribe/services/ocr_service.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter/foundation.dart';
-import 'package:aitranscribe/constants.dart';
 
 class GemmaService {
   static final GemmaService _instance = GemmaService._internal();
@@ -11,15 +9,13 @@ class GemmaService {
   GemmaService._internal();
 
   final ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
+
   bool isModelReady = false;
   InferenceModel? _model;
-  InferenceChat? _persistentChat; // Keep one chat alive
 
-  // Call this in main() to start loading in the background
   Future<void> init() async {
     if (isModelReady) return;
 
-    // 1. Check/Install Model
     if (!FlutterGemma.hasActiveModel()) {
       await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
           .fromNetwork(
@@ -28,18 +24,15 @@ class GemmaService {
           )
           .withProgress((p) => downloadProgress.value = p / 100)
           .install();
-          debugPrint("Installed model: $AppConstants.modelUrlVision");
+
+      debugPrint("Installed model: ${AppConstants.modelUrlVision}");
     }
 
-    // 2. Pre-warm: Load model into memory
     _model = await FlutterGemma.getActiveModel(
-      maxTokens: 512, // Lower maxTokens = faster response
-      preferredBackend: PreferredBackend.gpu, // Use GPU for 2-5x speed
+      maxTokens: 1024,
+      preferredBackend: PreferredBackend.gpu,
     );
 
-    // 3. Pre-warm: Initialize the chat session
-    _persistentChat = await _model!.createChat();
-    
     isModelReady = true;
     downloadProgress.value = 1.0;
   }
@@ -47,25 +40,57 @@ class GemmaService {
   Stream<String> toJsonStream(List<OcrLine> lines) async* {
     if (!isModelReady) await init();
 
-    // Reset history so coordinates from previous scans don't confuse the model
-    await _persistentChat!.clearHistory();
+    final chat = await _model!.createChat(
+      temperature: 1.0,
+      topK: 64,
+      topP: 0.95,
+    );
 
-    // Use a compact prompt format to reduce token processing time
-    final formattedText = lines.map((l) => "${l.text} [${l.x},${l.y}]").join(' | ');
+    final formattedText =
+        lines.map((l) => "${l.text} [${l.x},${l.y}]").join(' | ');
 
     final prompt = """
-Extract to JSON (Dutch). Fields: serienummer, bouwjaar, merk.
-Use [x,y] for layout. Output ONLY JSON.
-Tekst: $formattedText
+Extraheer gegevens uit onderstaande tekst.
+Geef alleen geldige JSON. Geen uitleg.
+
+Input:
+$formattedText
+
+Output:
+{"serienummer":"...","bouwjaar":"...","merk":"..."}
 """;
 
-    await _persistentChat!.addQueryChunk(Message.text(text: prompt, isUser: true));
+    await chat.addQuery(Message.text(text: prompt));
 
     String accumulated = "";
-    await for (final chunk in _persistentChat!.generateChatResponseAsync()) {
-      // Clean up markdown markers if the model includes them
-      String raw = chunk.toString().replaceAll(RegExp(r'```json|```'), '').trim();
+    String lastChunk = "";
+    int repeatCount = 0;
+
+    await for (final chunk in chat.generateChatResponseAsync()) {
+      String raw = chunk
+          .toString()
+          .replaceAll(RegExp(r'```json|```'), '')
+          .trim();
+
+      if (raw == lastChunk) {
+        repeatCount++;
+        if (repeatCount > 5) break;
+      } else {
+        repeatCount = 0;
+      }
+
+      lastChunk = raw;
       accumulated += raw;
+
+      if (accumulated.contains('}')) {
+        accumulated = accumulated.substring(
+          0,
+          accumulated.indexOf('}') + 1,
+        );
+        yield accumulated;
+        break;
+      }
+
       yield accumulated;
     }
   }
